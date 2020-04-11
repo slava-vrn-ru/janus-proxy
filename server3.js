@@ -1,3 +1,4 @@
+/*jshint -W069 */
 var https = require('https'),
     fs = require('fs'),
     colors = require('colors'),
@@ -18,6 +19,8 @@ var app = express();
 var rt = express.Router();
 
 rt.use(rtLog);
+rt.use('/janus/:idSession/:idSender', rtMain);
+rt.use('/janus/:idSession', rtMain);
 rt.use('/janus', rtMain);
 rt.use(rtUnrouted);
 
@@ -29,24 +32,42 @@ https.createServer(httpsOpts, app).listen(8889, function(){
   console.log('proxy listen 8889');
 });
 
-function rtMain(req, res, next) {
+function rtMain(req, res) {
   console.log('JANUS: %s %s\n', req.method, req.url, req.body);
-  if (!checkRequest(req.body)) {
+  if (!checkRequest(req.body, req.params)) {
+    console.log(('Wrong request\n').red, req.body);
     res.json({'error':'wrong request'});
     return;
   }
-  let jAct = req.body.janus;
+  let jAct = req.body['janus'];
   if (jAct == 'create') {
-    var newEnt = entityCreate(entities);
+    let newEnt = entityCreate(entities, req.body['apisecret']);
     res.json({"janus": "success", "transaction": "Transaction", "data": { "id": newEnt[pnIdSessIntrn] }});
   } else if (jAct == 'attach') {
-    res.json({'action':'attach'});
+    console.log(req.params.yellow);
+    let exEnt = entityFind(entities, pnIdSessIntrn, req.params['idSession']);
+    if (exEnt) {
+      exEnt[pnIdSndrIntrn] = idGen(entities, false);
+      res.json({"janus": "success", "session_id": req.params['idSession'], "transaction": "Transaction", "data": { "id": exEnt[pnIdSndrIntrn] }});
+    } else {
+      console.log(('Session not found\n').red, req.body);
+      res.json({'error':'session not found'});
+    }
+  } else if (jAct == 'message') {
+    console.log(req.params.yellow);
+    let exEnt = entityFind(entities, pnIdSndrIntrn, req.params['idSender']);
+    if (exEnt) {
+      
+    } else {
+      console.log(('Sender not found\n').red, req.body);
+      res.json({'error':'sender not found'});
+    }
   } else {
     console.log(('Unhandled action: %s').red, jAct, req.body);
     res.json({'error':'unhandled action'});
   }
 }
-function rtUnrouted(req, res, next) {
+function rtUnrouted(req, res) {
   console.log(('Unhandled path: %s %s\n').red, req.method, req.url, req.body);
   res.json({'error':'wrong path'});
 }
@@ -55,10 +76,13 @@ function rtLog(req, res, next) {
   next();
 }
 
-function checkRequest(strReq) {
+function checkRequest(strReq, aReqParams) {
   if (!strReq['apisecret']) return false;
-  return (strReq['janus']=='create' && strReq['transaction']=='Transaction');
+  return (strReq['janus']=='create' && strReq['transaction']=='Transaction') ||
+         (strReq['janus']=='attach' && aReqParams['idSession'] && strReq['plugin']=='janus.plugin.videoroom' && strReq['transaction']=='Transaction') ||
+         (strReq['janus']=='message' && aReqParams['idSession'] && aReqParams['idSender'] && strReq['body'] && strReq['transaction']=='Transaction');
 }
+
 function entityCreate(aEntity, apiSec) {
   var newEntity = {};
   newEntity[pnIdSessIntrn] = idGen(aEntity);
