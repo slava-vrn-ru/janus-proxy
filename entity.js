@@ -2,13 +2,17 @@
 
 function Entities() {
   var self = this;
-  this.servers = [];
+  this.servers = [
+    { 'url': 'https://janus.kotpusk.ru:8889', 'apiSec': 'XC8xmqcVI5Gcgw3epT0I9CkCQTfZNU4e'},
+    { 'url': 'http://34.69.205.108:8880', 'apiSec': '5BVLFa3JWMFKzCNEPABevF7rDxJYvFxVn92X'},
+    { 'url': 'http://35.193.110.194:8880', 'apiSec': '5BVLFa3JWMFKzCNEPABevF7rDxJYvFxVn92X'},
+                  ];
   this.rooms = [];
   this.entities = [];
   
   // create new entity. First, it empty, exclude 
-  this.addEntity = function(apiSec){
-    var newEnt = new Entity(self.idGen(), apiSec);
+  this.addEntity = function(idx){
+    var newEnt = new Entity(self.idGen(), idx);
     this.entities.push(newEnt);
     return newEnt;
   };
@@ -30,7 +34,7 @@ function Entities() {
   };
   this.findServerByRoom = function(room) {
     var ent = self.entities.find(item => item.room == room);
-    return ent ? ent.server : "";
+    return ent ? { 'srvURL': ent.srvURL, 'srvApiSec': ent.srvApiSec } : 0;
   };
   this.idGen = function(isSessionId = true) {
     const maxVal = Number.MAX_SAFE_INTEGER;
@@ -45,13 +49,15 @@ function Entities() {
   };
 }
 
-function Entity(idSessionExt, apiSec) {
+function Entity(idSessionExt, idx) {
+  this.idx = idx;
+  this.cntReq = 0;
   this.idSessionExt = idSessionExt;
   this.idSessionInt = 0;
   this.idSenderExt = 0;
   this.idSenderInt = 0;
-  this.apiSec = apiSec;
-  this.server = "";
+  this.srvURL = "";
+  this.srvApiSec = "";
   this.room = 0;
   this.reqCache = [];
 }

@@ -24,6 +24,7 @@ rt.use(oLogic.rtLog);
 rt.use('/janus/:idSession/:idSender', oLogic.rtMain);
 rt.use('/janus/:idSession', oLogic.rtMain);
 rt.use('/janus', oLogic.rtMain);
+rt.use('/service', oLogic.rtService);
 rt.use(oLogic.rtUnrouted);
 
 app.use(bodyParser.json());
