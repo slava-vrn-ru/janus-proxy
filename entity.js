@@ -2,12 +2,6 @@
 
 function Entities() {
   var self = this;
-  this.servers = [
-    { 'url': 'https://janus.kotpusk.ru:8889', 'apiSec': 'XC8xmqcVI5Gcgw3epT0I9CkCQTfZNU4e'},
-    { 'url': 'http://34.69.205.108:8880', 'apiSec': '5BVLFa3JWMFKzCNEPABevF7rDxJYvFxVn92X'},
-    { 'url': 'http://35.193.110.194:8880', 'apiSec': '5BVLFa3JWMFKzCNEPABevF7rDxJYvFxVn92X'},
-                  ];
-  this.rooms = [];
   this.entities = [];
   
   // create new entity. First, it empty, exclude 
@@ -34,7 +28,7 @@ function Entities() {
   };
   this.findServerByRoom = function(room) {
     var ent = self.entities.find(item => item.room == room);
-    return ent ? { 'srvURL': ent.srvURL, 'srvApiSec': ent.srvApiSec } : 0;
+    return ent ? ent.server : undefined;
   };
   this.idGen = function(isSessionId = true) {
     const maxVal = Number.MAX_SAFE_INTEGER;
@@ -42,8 +36,6 @@ function Entities() {
     var idCandidate;
     do {
       idCandidate = minVal + Math.floor((maxVal - minVal) * Math.random());
-      /*if (isSessionId) idCandidate = 2936192486478980;
-      else idCandidate = 5962896525863409;*/
     } while (isSessionId ? self.findBySessionIDExt(idCandidate) : self.findBySenderIDExt(idCandidate));
     return idCandidate;
   };
@@ -56,11 +48,10 @@ function Entity(idSessionExt, idx) {
   this.idSessionInt = 0;
   this.idSenderExt = 0;
   this.idSenderInt = 0;
-  this.srvURL = "";
-  this.srvApiSec = "";
+  this.server = undefined;
   this.room = 0;
+  this.isDead = false;
   this.reqCache = [];
 }
 
 exports.Entities = Entities;
-//exports.Entity = Entity;

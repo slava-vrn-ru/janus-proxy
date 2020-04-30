@@ -5,16 +5,15 @@ var https = require('https');
 var fs = require('fs');
 var express = require('express');
 var bodyParser = require('body-parser');
+var config = require('getconfig');
 
-var entities = require('./entity.js');
 var logic = require('./logic.js');
 
-var oEntities = new entities.Entities();
-var oLogic = new logic.Logic(oEntities);
+var oLogic = new logic.Logic();
 
 var httpsOpts = {
-  key: fs.readFileSync('/etc/letsencrypt/live/proxy.kotpusk.ru/privkey.pem'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/proxy.kotpusk.ru/cert.pem'),
+  key: fs.readFileSync(config.proxy.key, 'utf8'),
+  cert: fs.readFileSync(config.proxy.cert, 'utf8'),
 };
 
 var app = express();
@@ -24,7 +23,8 @@ rt.use(oLogic.rtLog);
 rt.use('/janus/:idSession/:idSender', oLogic.rtMain);
 rt.use('/janus/:idSession', oLogic.rtMain);
 rt.use('/janus', oLogic.rtMain);
-rt.use('/service', oLogic.rtService);
+rt.use('/v1/service', oLogic.rtService);
+rt.use('/v1/status', oLogic.rtStatus);
 rt.use(oLogic.rtUnrouted);
 
 app.use(bodyParser.json());
@@ -35,8 +35,3 @@ https.createServer(httpsOpts, app).listen(8889, function(){
   console.log('proxy listen 8889');
 });
 
-
-/*var newEnt = oEntities.addEntity('321');
-console.log(newEnt);
-newEnt = oEntities.setSenderIDExt(newEnt.idSessionExt);
-console.log(newEnt);*/
