@@ -1,35 +1,30 @@
 {
-    "server": {
-        "port": 8899,
-        "key": "/opt/cert/privkey.pem",
-        "cert":"/opt/cert/cert.pem",
-        "ca": "/opt/cert/fullchain.pem"
+    "proxy": {
+        "key": "/etc/letsencrypt/live/proxy.kotpusk.ru/privkey.pem",
+        "cert":"/etc/letsencrypt/live/proxy.kotpusk.ru/cert.pem",
+        "ca": "/etc/letsencrypt/live/proxy.kotpusk.ru/fullchain.pem"
     },
     "janus": [
         {
-            "host": "https://proxy.kotpusk.ru:8889",
-            "apiSecret": "XC8xmqcVI5Gcgw3epT0I9CkCQTfZNU4e",
-            "responder": "wss://janus.kotpusk.ru:8887",
+            "host": "https://janus.kotpusk.ru:8889",
+            "responder": "ws://janus.kotpusk.ru:8887",
             "endpoint":  "wss://janus.kotpusk.ru:8888",
+            "apiSecret": "XC8xmqcVI5Gcgw3epT0I9CkCQTfZNU4e",
             "enabled": true
         },
         {
-            "host": "https://janus.kotpusk.ru:8889",
-            "apiSecret": "XC8xmqcVI5Gcgw3epT0I9CkCQTfZNU4e",
-            "responder": "wss://janus.kotpusk.ru:8887",
-            "endpoint":  "wss://janus.kotpusk.ru:8888",
-            "enabled": false
-        }],
-    "iceServers": [
-        {
-            "urls": ["turn:janus.kotpusk.ru:3478"],
-            "username": "user",
-            "credential": "pzWL4JMBEgrRBUK46Cyx4JSSgeSYJNSC"
+            "host": "http://34.69.205.108:8880",
+            "responder": "ws://34.69.205.108:8890",
+            "endpoint": "ws://34.69.205.108:8870",
+            "apiSecret": "5BVLFa3JWMFKzCNEPABevF7rDxJYvFxVn92X",
+            "enabled": true
         },
         {
-            "urls": ["stun:janus.kotpusk.ru:3478"],
-            "username": "user",
-            "credential": "pzWL4JMBEgrRBUK46Cyx4JSSgeSYJNSC"
+            "host": "http://35.193.110.194:8880",
+            "responder": "ws://35.193.110.194:8890",
+            "endpoint": "ws://35.193.110.194:8870",
+            "apiSecret": "5BVLFa3JWMFKzCNEPABevF7rDxJYvFxVn92X",
+            "enabled": true
         }
     ],
     "redis": {
@@ -39,10 +34,5 @@
         "userList": "userList",
         "janusRoomForRoom": "janusRoomId",
         "janusInstanceList": "janusInstances"
-    },
-    "backend": {
-        "host": "https://localhost"
-    },
-    "userLimit": 100,
-    "timeout": 90
+    }
 }

@@ -54,6 +54,7 @@ function Logic() {
         self.actResponseAttach(res, entity);
         break;
       case 'message':
+        // Need to process exit room
         console.log(colors.yellow('%s received Message: '+req.body['body']['request']+' (SessionExt: %s; SenderExt: %s)'), self.jalog.textTime(), idSessionExt, idSenderExt);
         if (!self.checkReqMessage(req.body, idSessionExt, idSenderExt)) { self.actErrWrongReq(req, res); return; }
         entity = self.entities.findBySenderIDExt(idSenderExt);
@@ -147,6 +148,7 @@ function Logic() {
         console.log(colors.red('request #%d.%d discarded - %s is dead'), entity.idx, locCntReq, srv.url);
         self.jalog.log(entity.idx, 'pr->cl', 'request #'+locCntReq+' discarded - '+srv.url+' is dead');
         var respData = {"janus": "hangup", "session_id": idSessionExt, "sender": idSenderExt, "reason": "Janus goes down"};
+        // Need to send it once, after this send (illegal sessionID) or empty answer
         res.json(respData);
         return;
       }
@@ -286,6 +288,7 @@ function Logic() {
   // If there was a failure in communication with Janus server at the initial phase
   this.actReselectionServer = function(entity) {
     var room = entity.room;
+    // TODO!!! Exclude this entity!
     if (self.entities.findServerByRoom(room)) actResponseErrorHungup(entity);
     else {
       entity.server.setServerDead();

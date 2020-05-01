@@ -22,6 +22,7 @@ function Servers() {
         s.cpu = Number(data.data.cpu);
         s.ram = Number(data.data.ram);
         s.hdd = Number(data.data.hdd);
+        
       });
       socketResponder.on('connect', function(data) {
         console.log('Media server responder connected: %s', s.responder);
@@ -49,7 +50,7 @@ function Servers() {
         s.setServerAlive();
         connection.on('close', data => {
           console.log('Janus is dead: %s', s.url);
-          s.setServerDead();
+          if (!s.isDead) s.setServerDead();
         });
       });
       setInterval(() => {
@@ -61,11 +62,15 @@ function Servers() {
  
    // Server selection function
   this.serverChoose = function() {
-    //self.servers.sort((a, b) => a.cpu > b.cpu ? 1 : -1);
-    var srv = self.servers.shift();
-    self.servers.push(srv);
-    //return self.servers[0];
-    return srv;
+    self.servers.sort(function(a, b) {
+      let rating = Number(a.isDead) - Number(b.isDead);
+      if (rating) return rating;
+      return a.cpu - b.cpu;
+    });
+    return self.servers[0];
+    //var srv = self.servers.shift();
+    //self.servers.push(srv);
+    //return srv;
   };
   
   this.findServerByURL = function(srvURL) {
@@ -86,8 +91,8 @@ function Server(config_elem) {
   this.socketResponder = undefined;
   this.socketEndpoint = undefined;
   this.cpu = Number.MAX_SAFE_INTEGER;
-  this.ram = Number.MAX_SAFE_INTEGER;
-  this.hdd = Number.MAX_SAFE_INTEGER;
+  this.ram = 0;
+  this.hdd = 0;
   this.isDead = true;
   
   this.bindEntity = function(entity) {
@@ -97,8 +102,8 @@ function Server(config_elem) {
   this.setServerDead = function() {
     self.isDead = true;
     self.cpu = Number.MAX_SAFE_INTEGER;
-    self.ram = Number.MAX_SAFE_INTEGER;
-    self.hdd = Number.MAX_SAFE_INTEGER;
+    self.ram = 0;
+    self.hdd = 0;
     for (let i=0; i<self.entities.length; i++) {
       self.entities[i].isDead = true;
     }
