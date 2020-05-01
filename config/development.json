@@ -1,0 +1,48 @@
+{
+    "server": {
+        "port": 8899,
+        "key": "/opt/cert/privkey.pem",
+        "cert":"/opt/cert/cert.pem",
+        "ca": "/opt/cert/fullchain.pem"
+    },
+    "janus": [
+        {
+            "host": "https://proxy.kotpusk.ru:8889",
+            "apiSecret": "XC8xmqcVI5Gcgw3epT0I9CkCQTfZNU4e",
+            "responder": "wss://janus.kotpusk.ru:8887",
+            "endpoint":  "wss://janus.kotpusk.ru:8888",
+            "enabled": true
+        },
+        {
+            "host": "https://janus.kotpusk.ru:8889",
+            "apiSecret": "XC8xmqcVI5Gcgw3epT0I9CkCQTfZNU4e",
+            "responder": "wss://janus.kotpusk.ru:8887",
+            "endpoint":  "wss://janus.kotpusk.ru:8888",
+            "enabled": false
+        }],
+    "iceServers": [
+        {
+            "urls": ["turn:janus.kotpusk.ru:3478"],
+            "username": "user",
+            "credential": "pzWL4JMBEgrRBUK46Cyx4JSSgeSYJNSC"
+        },
+        {
+            "urls": ["stun:janus.kotpusk.ru:3478"],
+            "username": "user",
+            "credential": "pzWL4JMBEgrRBUK46Cyx4JSSgeSYJNSC"
+        }
+    ],
+    "redis": {
+        "host": "localhost",
+        "port": 6379,
+        "streamList": "streamList",
+        "userList": "userList",
+        "janusRoomForRoom": "janusRoomId",
+        "janusInstanceList": "janusInstances"
+    },
+    "backend": {
+        "host": "https://localhost"
+    },
+    "userLimit": 100,
+    "timeout": 90
+}
